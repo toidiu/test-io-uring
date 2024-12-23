@@ -27,6 +27,7 @@ fn main() -> Result {
 
 fn setup_io_uring(queue_len: u32) -> Result<io_uring> {
     unsafe {
+        // https://docs.rs/liburing/latest/liburing/struct.io_uring.html
         let mut ring: io_uring = zeroed();
         let ret = io_uring_queue_init(queue_len, &mut ring, 0);
 
@@ -40,6 +41,7 @@ fn setup_io_uring(queue_len: u32) -> Result<io_uring> {
 
 fn submit_noop(ring: &mut io_uring) -> Result {
     unsafe {
+        // https://docs.rs/liburing/latest/liburing/struct.io_uring_sqe.html
         let sqe = io_uring_get_sqe(ring);
         if sqe.is_null() {
             return Err(io::Error::new(io::ErrorKind::Other, "failed to get SQE"));
@@ -58,6 +60,7 @@ fn submit_noop(ring: &mut io_uring) -> Result {
 }
 
 fn wait_for_completion(ring: &mut io_uring) -> Result {
+    // https://docs.rs/liburing/latest/liburing/struct.io_uring_cqe.html
     let mut cqe: *mut io_uring_cqe = null_mut();
     let ret = unsafe { io_uring_wait_cqe(ring, &mut cqe) };
     if ret < 0 {
